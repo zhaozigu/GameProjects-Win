@@ -20,7 +20,7 @@ public:
 
     int GetUpdateOrder() const { return mUpdateOrder; }
 
-    std::shared_ptr<Component> GetSelf()
+    virtual std::shared_ptr<Component> GetSelf()
     {
         return shared_from_this();
     }
