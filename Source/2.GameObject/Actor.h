@@ -11,7 +11,7 @@ using GamePtr = Game*;
 class Actor : public std::enable_shared_from_this<Actor>
 {
 public:
-    enum State
+    enum class State
     {
         EActive,
         EPaused,

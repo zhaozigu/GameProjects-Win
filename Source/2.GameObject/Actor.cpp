@@ -6,7 +6,7 @@
 #include "Component.h"
 
 Actor::Actor()
-    : mState(EActive), mPosition(Vector2::Zero), mScale(1.0f), mRotation(0.0f), mGame(nullptr)
+    : mState(State::EActive), mPosition(Vector2::Zero), mScale(1.0f), mRotation(0.0f), mGame(nullptr)
 {
 }
 
@@ -23,7 +23,7 @@ Actor::~Actor()
 
 void Actor::Update(float deltaTime)
 {
-    if (mState == EActive)
+    if (mState == State::EActive)
     {
         UpdateComponents(deltaTime);
         UpdateActor(deltaTime);
