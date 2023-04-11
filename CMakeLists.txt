@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(Source/0.Skeleton)
 add_subdirectory(Source/1.PingPong)
+add_subdirectory(Source/2.GameObject)
