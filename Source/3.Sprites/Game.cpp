@@ -4,6 +4,7 @@
 #include "SpriteComponent.h"
 #include "BGSpriteComponent.h"
 #include "SDL_image.h"
+#include "Ship.h"
 
 Game::Game()
 	: mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mTicksCount(0), mUpdatingActors(false)
@@ -86,16 +87,20 @@ void Game::RunLoop()
 
 void Game::LoadData()
 {
+	mShip = std::make_shared<Ship>();
+	mShip->Initialize(this);
+	mShip->SetPosition(Vector2(100.0f, 384.0f));
+	mShip->SetScale(1.5f);
+
 	std::shared_ptr<Actor> temp = std::make_shared<Actor>();
-	temp->BindGame(this);
+	temp->Initialize(this);
 	temp->SetPosition(Vector2(512.0f, 384.0f));
 
 	std::shared_ptr<class BGSpriteComponent> bg = std::make_shared<BGSpriteComponent>(temp);
 	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
-	std::vector<SDL_Texture*> bgtexs = {
+	std::vector<SDL_Texture *> bgtexs = {
 		GetTexture("Assets/Farback01.png"),
-		GetTexture("Assets/Farback02.png")
-	};
+		GetTexture("Assets/Farback02.png")};
 	bg->SetBGTextures(bgtexs);
 	bg->SetScrollSpeed(-100.0f);
 	bg->AddComponent();
@@ -105,8 +110,7 @@ void Game::LoadData()
 	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
 	bgtexs = {
 		GetTexture("Assets/Stars.png"),
-		GetTexture("Assets/Stars.png")
-	};
+		GetTexture("Assets/Stars.png")};
 	bg->SetBGTextures(bgtexs);
 	bg->SetScrollSpeed(-200.0f);
 	bg->AddComponent();
@@ -115,7 +119,7 @@ void Game::LoadData()
 void Game::UnloadData()
 {
 	// 销毁texture
-	for (auto& i : mTextures)
+	for (auto &i : mTextures)
 	{
 		SDL_DestroyTexture(i.second);
 	}
@@ -168,6 +172,9 @@ void Game::ProcessInput()
 	{
 		mIsRunning = false;
 	}
+
+	// 处理飞船的输入
+	mShip->ProcessKeyboard(state);
 }
 
 void Game::UpdateGame()
@@ -222,7 +229,7 @@ void Game::GenerateOutput()
 	SDL_RenderClear(mRenderer);
 
 	// 绘制所有精灵组件
-	for (auto& sprite : mSprites)
+	for (auto &sprite : mSprites)
 	{
 		sprite->Draw(mRenderer);
 	}

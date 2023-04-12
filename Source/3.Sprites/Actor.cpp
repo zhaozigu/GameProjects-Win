@@ -25,6 +25,11 @@ Actor::~Actor()
 #endif // _DEBUG
 }
 
+void Actor::Initialize(GamePtr game)
+{
+    BindGame(game);
+}
+
 void Actor::Update(float deltaTime)
 {
     if (mState == State::EActive)

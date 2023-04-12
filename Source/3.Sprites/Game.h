@@ -67,4 +67,6 @@ private:
 
 	std::unordered_map<std::string, SDL_Texture*> mTextures;
 	bool mUpdatingActors;
+
+	std::shared_ptr<class Ship> mShip;
 };

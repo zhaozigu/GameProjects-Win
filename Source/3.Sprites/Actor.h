@@ -21,6 +21,8 @@ public:
     Actor();
     virtual ~Actor();
 
+    virtual void Initialize(GamePtr game);
+
     virtual std::shared_ptr<Actor> GetSelf()
     {
         return shared_from_this();
