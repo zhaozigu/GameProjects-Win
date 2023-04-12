@@ -8,8 +8,23 @@ find_package(SDL2_image REQUIRED)
 
 file (GLOB SRC_DIR_FILES ${PROJECT_SOURCE_DIR}/*.cpp)
 
-if(SDL2_FOUND)
+if(SDL2_FOUND AND SDL2_image_FOUND)
   include_directories(${SDL2_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR})
   add_executable(${PROJECT_NAME} ${SRC_DIR_FILES})
-  target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} SDL2_image::SDL2_image)
+  # .dll
+  add_custom_command (TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_FILE:SDL2_image::SDL2_image>  $<TARGET_FILE_DIR:${PROJECT_NAME}>
+  )
+
+  # to run
+  add_custom_command (TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+  ${PROJECT_SOURCE_DIR}/Assets  $<TARGET_FILE_DIR:${PROJECT_NAME}>/Assets
+  )
+
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:${PROJECT_NAME}>
+  )
 endif()

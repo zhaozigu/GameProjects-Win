@@ -2,6 +2,8 @@
 #include "Actor.h"
 #include "Component.h"
 #include "SpriteComponent.h"
+#include "BGSpriteComponent.h"
+#include "SDL_image.h"
 
 Game::Game()
 	: mWindow(nullptr), mRenderer(nullptr), mIsRunning(true), mTicksCount(0), mUpdatingActors(false)
@@ -10,7 +12,9 @@ Game::Game()
 
 Game::~Game()
 {
+#ifdef _DEBUG
 	SDL_Log("~Game()");
+#endif // _DEBUG
 }
 
 bool Game::Initialize()
@@ -50,11 +54,21 @@ bool Game::Initialize()
 		return false;
 	}
 
+	if (IMG_Init(IMG_INIT_PNG) == 0)
+	{
+		SDL_Log("不能初始化SDL_image: %s", SDL_GetError());
+		return false;
+	}
+
+	LoadData();
+	mTicksCount = SDL_GetTicks();
 	return true;
 }
 
 void Game::Shutdown()
 {
+	UnloadData();
+	IMG_Quit();
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();
@@ -68,6 +82,66 @@ void Game::RunLoop()
 		UpdateGame();
 		GenerateOutput();
 	}
+}
+
+void Game::LoadData()
+{
+	std::shared_ptr<Actor> temp = std::make_shared<Actor>();
+	temp->BindGame(this);
+	temp->SetPosition(Vector2(512.0f, 384.0f));
+
+	std::shared_ptr<class BGSpriteComponent> bg = std::make_shared<BGSpriteComponent>(temp);
+	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
+	std::vector<SDL_Texture*> bgtexs = {
+		GetTexture("Assets/Farback01.png"),
+		GetTexture("Assets/Farback02.png")
+	};
+	bg->SetBGTextures(bgtexs);
+	bg->SetScrollSpeed(-100.0f);
+	bg->AddComponent();
+
+	// 创建一个更近的背景
+	bg = std::make_shared<BGSpriteComponent>(temp, 50);
+	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
+	bgtexs = {
+		GetTexture("Assets/Stars.png"),
+		GetTexture("Assets/Stars.png")
+	};
+	bg->SetBGTextures(bgtexs);
+	bg->SetScrollSpeed(-200.0f);
+	bg->AddComponent();
+}
+
+void Game::UnloadData()
+{
+	// 销毁texture
+	for (auto& i : mTextures)
+	{
+		SDL_DestroyTexture(i.second);
+	}
+	mTextures.clear();
+}
+
+SDL_Texture *Game::LoadTexture(const char *fileName)
+{
+	// 从文件中加载
+	SDL_Surface *surf = IMG_Load(fileName);
+
+	if (!surf)
+	{
+		SDL_Log("加载图像文件 %s 失败", fileName);
+		return nullptr;
+	}
+
+	// 从 surface 创建 texture
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(mRenderer, surf);
+	SDL_FreeSurface(surf);
+	if (!tex)
+	{
+		SDL_Log("%s surface 转换到 texture 失败!", fileName);
+		return nullptr;
+	}
+	return tex;
 }
 
 void Game::ProcessInput()
@@ -113,27 +187,46 @@ void Game::UpdateGame()
 	{
 		deltaTime = 0.05f;
 	}
+
+	mTicksCount = SDL_GetTicks();
+
+	// 更新所有actor
+	mUpdatingActors = true;
+	for (auto &actor : mActors)
+	{
+		actor->Update(deltaTime);
+	}
+	mUpdatingActors = false;
+
+	// 移动待定actor到mActors
+	for (auto &pending : mPendingActors)
+	{
+		mActors.emplace_back(pending);
+	}
+	mPendingActors.clear();
+
+	// 添加 dead actor 到临时向量
+	std::vector<std::shared_ptr<Actor>> deadActors;
+	for (auto &actor : mActors)
+	{
+		if (actor->GetState() == Actor::State::EDead)
+		{
+			deadActors.emplace_back(actor);
+		}
+	}
 }
-
-
 
 void Game::GenerateOutput()
 {
-	// 设置 Tiffany 蓝
-	SDL_SetRenderDrawColor(
-		mRenderer,
-		129, // R
-		216, // G
-		209, // B
-		255	 // A
-	);
-	// 清理后缓冲区
+	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(mRenderer);
 
-	// 设置绘制颜色
-	SDL_SetRenderDrawColor(mRenderer, 0, 0, 255, 255);
+	// 绘制所有精灵组件
+	for (auto& sprite : mSprites)
+	{
+		sprite->Draw(mRenderer);
+	}
 
-	// 交换前后缓冲区
 	SDL_RenderPresent(mRenderer);
 }
 
@@ -196,4 +289,37 @@ void Game::RemoveSprite(std::shared_ptr<SpriteComponent> &&sprite)
 	// (不能交换，不然顺序就没了)
 	auto iter = std::find(mSprites.begin(), mSprites.end(), sprite);
 	mSprites.erase(iter);
+}
+
+SDL_Texture *Game::GetTexture(const std::string &fileName)
+{
+	SDL_Texture *tex = nullptr;
+	// texture是否已经存在？
+	auto iter = mTextures.find(fileName);
+	if (iter != mTextures.end())
+	{
+		tex = iter->second;
+	}
+	else
+	{
+		// 从文件中加载
+		SDL_Surface *surf = IMG_Load(fileName.c_str());
+		if (!surf)
+		{
+			SDL_Log("加载 texture 文件 %s 失败", fileName.c_str());
+			return nullptr;
+		}
+
+		// 从 surface 中创建 textures
+		tex = SDL_CreateTextureFromSurface(mRenderer, surf);
+		SDL_FreeSurface(surf);
+		if (!tex)
+		{
+			SDL_Log("无法把 %s 从surface转化到texture", fileName.c_str());
+			return nullptr;
+		}
+
+		mTextures.emplace(fileName.c_str(), tex);
+	}
+	return tex;
 }

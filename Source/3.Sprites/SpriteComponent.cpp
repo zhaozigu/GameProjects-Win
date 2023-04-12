@@ -5,11 +5,16 @@
 SpriteComponent::SpriteComponent(std::weak_ptr<Actor> owner, int drawOrder)
     : Component(owner), mTexture(nullptr), mDrawOrder(drawOrder), mTexWidth(0), mTexHeight(0)
 {
+#ifdef _DEBUG
+    SDL_Log("SpriteComponent()");
+#endif _DEBUG
 }
 
 SpriteComponent::~SpriteComponent()
 {
+#ifdef _DEBUG
   SDL_Log("~SpriteComponent()");
+#endif _DEBUG
 }
 
 void SpriteComponent::RemoveComponent()
@@ -17,6 +22,7 @@ void SpriteComponent::RemoveComponent()
   if (auto owner = mOwner.lock())
   {
     owner->GetGame()->RemoveSprite(std::dynamic_pointer_cast<SpriteComponent>(GetSelf()));
+    owner->RemoveComponent(GetSelf());
   }
 }
 
@@ -25,6 +31,7 @@ void SpriteComponent::AddComponent()
   if (auto owner = mOwner.lock())
   {
     owner->GetGame()->AddSprite(std::dynamic_pointer_cast<SpriteComponent>(GetSelf()));
+    owner->AddComponent(GetSelf());
   }
 }
 

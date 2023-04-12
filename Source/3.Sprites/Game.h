@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <SDL.h>
 
 #include "Math.hpp"
@@ -34,7 +35,15 @@ public:
 
 	void RemoveSprite(std::shared_ptr<SpriteComponent> &&sprite);
 
+	SDL_Texture *GetTexture(const std::string &fileName);
+
 private:
+	void LoadData();
+
+	void UnloadData();
+
+	SDL_Texture *LoadTexture(const char *fileName);
+
 	// 处理进程输入
 	void ProcessInput();
 	// 更新游戏
@@ -56,5 +65,6 @@ private:
 	std::vector<std::shared_ptr<Actor>> mPendingActors;
 	std::vector<std::shared_ptr<SpriteComponent>> mSprites;
 
+	std::unordered_map<std::string, SDL_Texture*> mTextures;
 	bool mUpdatingActors;
 };

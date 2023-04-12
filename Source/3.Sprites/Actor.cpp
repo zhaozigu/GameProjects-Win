@@ -7,6 +7,9 @@
 Actor::Actor()
     : mState(State::EActive), mPosition(Vector2::Zero), mScale(1.0f), mRotation(0.0f), mGame(nullptr)
 {
+#ifdef _DEBUG
+    SDL_Log("Actor()");
+#endif // _DEBUG
 }
 
 void Actor::BindGame(GamePtr game)
@@ -17,7 +20,9 @@ void Actor::BindGame(GamePtr game)
 
 Actor::~Actor()
 {
-    SDL_Log("~Actor");
+#ifdef _DEBUG
+    SDL_Log("~Actor()");
+#endif // _DEBUG
 }
 
 void Actor::Update(float deltaTime)
