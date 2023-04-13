@@ -42,7 +42,11 @@ public:
 
 	SDL_Texture *GetTexture(const std::string &fileName);
 
+	std::vector<std::shared_ptr<Asteroid>> &GetAsteroids() { return mAsteroids; }
+
 private:
+	void RemoveDeadActors(std::vector<std::shared_ptr<Actor>> &actors);
+
 	void LoadData();
 
 	void UnloadData();
@@ -70,7 +74,7 @@ private:
 	std::vector<std::shared_ptr<Actor>> mPendingActors;
 	std::vector<std::shared_ptr<SpriteComponent>> mSprites;
 
-	std::unordered_map<std::string, SDL_Texture*> mTextures;
+	std::unordered_map<std::string, SDL_Texture *> mTextures;
 	bool mUpdatingActors;
 
 	std::shared_ptr<class Ship> mShip;

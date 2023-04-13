@@ -15,6 +15,7 @@ SpriteComponent::~SpriteComponent()
 #ifdef _DEBUG
   SDL_Log("~SpriteComponent()");
 #endif _DEBUG
+  RemoveComponent();
 }
 
 void SpriteComponent::RemoveComponent()

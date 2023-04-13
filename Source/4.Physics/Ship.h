@@ -14,5 +14,6 @@ public:
   void Initialize(GamePtr game) override;
 
 private:
-  //float mLaserCooldown;
+  float mLaserCooldown;
+  GamePtr mGame;
 };

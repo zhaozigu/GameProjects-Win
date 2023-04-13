@@ -86,20 +86,32 @@ void Game::RunLoop()
 	}
 }
 
+void Game::RemoveDeadActors(std::vector<std::shared_ptr<Actor>> &actors)
+{
+	auto new_end = std::remove_if(mActors.begin(), mActors.end(), [](const std::shared_ptr<Actor> &actor)
+								  { return actor->GetState() == Actor::State::EDead; });
+
+	if (new_end != mActors.end())
+	{
+		// 使用 erase 一次性删除所有符合条件的元素
+		mActors.erase(new_end, mActors.end());
+	}
+}
+
 void Game::LoadData()
 {
 	mShip = std::make_shared<Ship>();
 	mShip->Initialize(this);
-    mShip->SetPosition(Vector2(512.0f, 384.0f));
-    mShip->SetRotation(Math::PiOver2);
-	
+	mShip->SetPosition(Vector2(512.0f, 384.0f));
+	mShip->SetRotation(Math::PiOver2);
+
 	// 创建行星
-    constexpr int kNumAsteroids = 20;
-    for (int i = 0; i < kNumAsteroids; i++)
-    {
-        auto t = std::make_shared<Asteroid>();
+	constexpr int kNumAsteroids = 20;
+	for (int i = 0; i < kNumAsteroids; i++)
+	{
+		auto t = std::make_shared<Asteroid>();
 		t->Initialize(this);
-    }
+	}
 }
 
 void Game::UnloadData()
@@ -160,11 +172,11 @@ void Game::ProcessInput()
 	}
 
 	mUpdatingActors = true;
-    for (auto actor : mActors)
-    {
-        actor->ProcessInput(state);
-    }
-    mUpdatingActors = false;
+	for (auto actor : mActors)
+	{
+		actor->ProcessInput(state);
+	}
+	mUpdatingActors = false;
 }
 
 void Game::UpdateGame()
@@ -202,15 +214,7 @@ void Game::UpdateGame()
 	}
 	mPendingActors.clear();
 
-	// 添加 dead actor 到临时向量
-	std::vector<std::shared_ptr<Actor>> deadActors;
-	for (auto &actor : mActors)
-	{
-		if (actor->GetState() == Actor::State::EDead)
-		{
-			deadActors.emplace_back(actor);
-		}
-	}
+	RemoveDeadActors(mActors);
 }
 
 void Game::GenerateOutput()
@@ -285,7 +289,10 @@ void Game::RemoveSprite(std::shared_ptr<SpriteComponent> &&sprite)
 {
 	// (不能交换，不然顺序就没了)
 	auto iter = std::find(mSprites.begin(), mSprites.end(), sprite);
-	mSprites.erase(iter);
+	if (iter != mSprites.end())
+	{
+		mSprites.erase(iter);
+	}
 }
 
 SDL_Texture *Game::GetTexture(const std::string &fileName)
@@ -328,10 +335,10 @@ void Game::AddAsteroid(std::shared_ptr<Asteroid> &&ast)
 
 void Game::RemoveAsteroid(std::shared_ptr<Asteroid> &&ast)
 {
-    auto iter = std::find(mAsteroids.begin(),
-        mAsteroids.end(), ast);
-    if (iter != mAsteroids.end())
-    {
-        mAsteroids.erase(iter);
-    }
+	auto iter = std::find(mAsteroids.begin(),
+						  mAsteroids.end(), ast);
+	if (iter != mAsteroids.end())
+	{
+		mAsteroids.erase(iter);
+	}
 }
