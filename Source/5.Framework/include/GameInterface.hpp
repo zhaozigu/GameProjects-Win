@@ -13,6 +13,8 @@ public:
     /// \brief Constructor
     GameInterface(){};
 
+    virtual ~GameInterface(){}
+
     /// \brief Initialize the game
     /// \return Returns true if initialization is successful, false otherwise
     virtual bool Initialize() = 0;

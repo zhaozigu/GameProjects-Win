@@ -11,7 +11,7 @@
 /// \brief Game class derived from GameInterface
 ///
 /// This is a concrete implementation of the GameInterface class.
-class Game : public GameInterface
+class Game final : public GameInterface
 {
 public:
 	Game();
