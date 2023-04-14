@@ -46,7 +46,7 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 
 bool Game::Initialize()
 {
-	return Initialize("Game", 100, 100, 1024, 768);
+	return Initialize("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768);
 }
 
 void Game::RunLoop()
