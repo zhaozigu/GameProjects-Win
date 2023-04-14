@@ -1,7 +1,7 @@
 #include "TextureAsset.hpp"
 #include "SDL_image.h"
 
-ATexture_SDL::ATexture_SDL(SDL_Renderer *renderer)
+ATexture_SDL::ATexture_SDL(std::optional<SDL_Renderer *>& renderer)
     : renderer_(renderer)
 {
 }
@@ -36,7 +36,7 @@ bool ATexture_SDL::LoadTexture(const char *filename)
     }
 
     // 从 surface 创建 texture
-    SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer_, surf);
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer_.value_or(nullptr), surf);
     SDL_FreeSurface(surf);
     if (!tex)
     {

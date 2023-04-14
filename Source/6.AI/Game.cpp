@@ -10,7 +10,7 @@ class Game::Impl
 {
 public:
 	std::optional<SDL_WinPtr> optWindow;
-	SDL_Renderer *renderer = nullptr;
+	std::optional<SDL_Renderer*> renderer;
 	bool mIsRunning = true;
 	AssetManager manager;
 };
@@ -64,13 +64,13 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 		auto&& res = impl->manager.GetResource("test").resource;
 		auto t = dynamic_cast<ATexture_SDL*>(res.get())->GetAsset();
 
-		if (SDL_RenderCopy(impl->renderer, t, nullptr, nullptr) != 0)
+		if (SDL_RenderCopy(impl->renderer.value_or(nullptr), t, nullptr, nullptr) != 0)
 		{
 			SDL_Log("SDL_RenderCopy: %s", SDL_GetError());
 			return false;
 		}
 
-		SDL_RenderPresent(impl->renderer);
+		SDL_RenderPresent(impl->renderer.value_or(nullptr));
 	}
 	else
 	{
@@ -96,7 +96,7 @@ void Game::RunLoop()
 
 void Game::Shutdown()
 {
-	SDL_DestroyRenderer(impl->renderer);
+	SDL_DestroyRenderer(impl->renderer.value_or(nullptr));
 	SDL_DestroyWindow(impl->optWindow.value());
 	SDL_Quit();
 }

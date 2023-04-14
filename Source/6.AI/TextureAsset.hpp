@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <optional>
 #include "SDL.h"
 #include "Asset.hpp"
 
@@ -14,7 +15,7 @@ struct asset_traits<AssetType::Texture>
 class ATexture_SDL : public Asset<AssetType::Texture>
 {
 public:
-    ATexture_SDL(SDL_Renderer *mRenderer);
+    ATexture_SDL(std::optional<SDL_Renderer *> &mRenderer);
 
     virtual ~ATexture_SDL();
 
@@ -23,5 +24,5 @@ public:
     virtual bool LoadTexture(const char *filename);
 
 protected:
-    SDL_Renderer *renderer_;
+    std::optional<SDL_Renderer *> renderer_;
 };
