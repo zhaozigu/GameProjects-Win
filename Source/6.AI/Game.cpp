@@ -44,8 +44,7 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 		SDL_Log("Failed to create window: %s", SDL_GetError());
 		return false;
 	}
-
-	// 创建渲染器
+	
 	impl->renderer = SDL_CreateRenderer(
 		impl->optWindow.value(),
 		-1,
@@ -61,7 +60,17 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 	if (tempTex->Initialize() && tempTex->LoadTexture("Assets/test.png"))
 	{
 		impl->manager.AddResource("test", AssetManager::AssetData{AssetType::Texture, std::move(tempTex)});
-		SDL_RenderCopy(impl->renderer, dynamic_cast<ATexture_SDL *>(impl->manager.GetResource("test").resource.get())->GetAsset(), 0, 0);
+
+		auto&& res = impl->manager.GetResource("test").resource;
+		auto t = dynamic_cast<ATexture_SDL*>(res.get())->GetAsset();
+
+		if (SDL_RenderCopy(impl->renderer, t, nullptr, nullptr) != 0)
+		{
+			SDL_Log("SDL_RenderCopy: %s", SDL_GetError());
+			return false;
+		}
+
+		SDL_RenderPresent(impl->renderer);
 	}
 	else
 	{
@@ -72,7 +81,7 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 
 bool Game::Initialize()
 {
-	return Initialize("AI Tower defense", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768);
+	return Initialize("AI Tower defense", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1456, 816);
 }
 
 void Game::RunLoop()

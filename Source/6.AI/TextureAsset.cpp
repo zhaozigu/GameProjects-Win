@@ -40,7 +40,6 @@ bool ATexture_SDL::LoadTexture(const char *filename)
     SDL_FreeSurface(surf);
     if (!tex)
     {
-        SDL_GetError();
         SDL_Log("%s surface conversion to texture failed! %s", filename, SDL_GetError());
         return false;
     }
