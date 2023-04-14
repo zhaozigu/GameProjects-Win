@@ -2,6 +2,9 @@
 /// \brief Game interface class header file
 
 #pragma once
+#include <memory>
+
+using SharedActor = std::shared_ptr<class Actor>;
 
 /// \class GameInterface
 /// \brief Game interface class
@@ -13,7 +16,7 @@ public:
     /// \brief Constructor
     GameInterface(){};
 
-    virtual ~GameInterface(){}
+    virtual ~GameInterface() {}
 
     /// \brief Initialize the game
     /// \return Returns true if initialization is successful, false otherwise
@@ -24,6 +27,10 @@ public:
 
     /// \brief Shut down the game
     virtual void Shutdown() = 0;
+
+    virtual void AddActor(SharedActor &&actor) = 0;
+
+    virtual void RemoveActor(SharedActor &&actor) = 0;
 
 protected:
     /// \brief Process input

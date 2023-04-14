@@ -38,6 +38,10 @@ public:
 	/// \brief Shut down the game
 	void Shutdown() override;
 
+	void AddActor(SharedActor&& actor) override;
+
+	void RemoveActor(SharedActor&& actor) override;
+
 private:
 	/// \brief Process input
 	/// This method should handle any input processing required by the game.
