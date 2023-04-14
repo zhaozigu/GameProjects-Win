@@ -21,7 +21,7 @@ class Resource
 {
 public:
     Resource(AssetType assetType = AssetType::Unknown) : type_(assetType){};
-    virtual ~Resource() {};
+    virtual ~Resource(){};
 
     virtual AssetType GetAssetType() { return type_; }
 
@@ -41,8 +41,9 @@ template <AssetType AssetTypeID>
 class Asset : public Resource, asset_traits<AssetTypeID>
 {
     using ResourceType = typename asset_traits<AssetTypeID>::asset_type;
+
 public:
-    Asset(): resource(nullptr) {};
+    Asset(AssetType assetType = AssetType::Unknown) : Resource(assetType), resource(nullptr){};
 
     virtual ~Asset(){};
 
@@ -56,29 +57,12 @@ protected:
     ResourceType resource;
 };
 
-class AssetManager
+namespace AssetCast
 {
-public:
-    AssetManager();
-
-    virtual ~AssetManager();
-
-    virtual AssetType GetAssetType(const std::string &name);
-
-    struct AssetData
+    template<typename T>
+    inline T* Cast(Resource* res)
     {
-        AssetType type;
-        std::shared_ptr<Resource> resource;
-    };
+        return dynamic_cast<T*>(res);
+    }
+}
 
-    virtual AssetData GetResource(const std::string &name);
-
-    virtual bool AddResource(const std::string &label, AssetData &&resource);
-
-    virtual void DeleteResource(const std::string &name);
-
-    virtual bool IsAssetExist(const std::string &name);
-
-protected:
-    std::unordered_map<std::string, AssetData> assets;
-};

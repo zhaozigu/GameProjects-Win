@@ -1,5 +1,6 @@
 #include "Game.hpp"
 #include "TextureAsset.hpp"
+#include "AssetManager.hpp"
 
 #include <optional>
 #include <SDL.h>
@@ -10,7 +11,7 @@ class Game::Impl
 {
 public:
 	std::optional<SDL_WinPtr> optWindow;
-	std::optional<SDL_Renderer*> renderer;
+	std::optional<SDL_Renderer *> renderer;
 	bool mIsRunning = true;
 	AssetManager manager;
 };
@@ -44,7 +45,7 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 		SDL_Log("Failed to create window: %s", SDL_GetError());
 		return false;
 	}
-	
+
 	impl->renderer = SDL_CreateRenderer(
 		impl->optWindow.value(),
 		-1,
@@ -59,10 +60,15 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 	auto tempTex = std::make_shared<ATexture_SDL>(impl->renderer);
 	if (tempTex->Initialize() && tempTex->LoadTexture("Assets/test.png"))
 	{
-		impl->manager.AddResource("test", AssetManager::AssetData{AssetType::Texture, std::move(tempTex)});
+		impl->manager.AddResource("test", tempTex);
 
-		auto&& res = impl->manager.GetResource("test").resource;
-		auto t = dynamic_cast<ATexture_SDL*>(res.get())->GetAsset();
+		auto res = impl->manager.GetResource("test");
+		if (res->GetAssetType() != AssetType::Texture)
+		{
+			return false;
+		}
+
+		auto t = AssetCast::Cast<ATexture_SDL>(res.get())->GetAsset();
 
 		if (SDL_RenderCopy(impl->renderer.value_or(nullptr), t, nullptr, nullptr) != 0)
 		{

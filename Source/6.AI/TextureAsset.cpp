@@ -1,13 +1,17 @@
 #include "TextureAsset.hpp"
 #include "SDL_image.h"
 
-ATexture_SDL::ATexture_SDL(std::optional<SDL_Renderer *>& renderer)
-    : renderer_(renderer)
+ATexture_SDL::ATexture_SDL(std::optional<SDL_Renderer *> &renderer)
+    : Asset(AssetType::Texture), renderer_(renderer)
 {
 }
 
 ATexture_SDL::~ATexture_SDL()
 {
+#ifdef _DEBUG
+    SDL_Log("~ATexture_SDL()");
+#endif // _DEBUG
+
     if (GetAsset())
     {
         SDL_DestroyTexture(GetAsset());
@@ -26,7 +30,6 @@ bool ATexture_SDL::Initialize()
 
 bool ATexture_SDL::LoadTexture(const char *filename)
 {
-    // 从文件中加载
     SDL_Surface *surf = IMG_Load(filename);
 
     if (!surf)
@@ -35,7 +38,7 @@ bool ATexture_SDL::LoadTexture(const char *filename)
         return false;
     }
 
-    // 从 surface 创建 texture
+    // create a texture from the surface
     SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer_.value_or(nullptr), surf);
     SDL_FreeSurface(surf);
     if (!tex)
