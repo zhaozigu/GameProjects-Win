@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.hpp"
+#include "Core/Component.hpp"
 #include "Asset.hpp"
 #include "RendererInterface.hpp"
 #include <memory>

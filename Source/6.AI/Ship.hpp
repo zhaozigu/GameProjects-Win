@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Actor.hpp"
+#include "Core/Actor.hpp"
 
 class Ship : public Actor
 {

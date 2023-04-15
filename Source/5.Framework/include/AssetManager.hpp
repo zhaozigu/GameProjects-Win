@@ -1,7 +1,7 @@
 #pragma once
 #include "Asset.hpp"
 
-using SharedResource = std::shared_ptr<Resource>;
+using SharedResource = std::shared_ptr<class Resource>;
 
 class AssetManager
 {

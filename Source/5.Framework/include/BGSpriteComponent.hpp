@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 
-#include "Math.hpp"
+#include "Core/Math.hpp"
 #include "SpriteComponent.hpp"
 class Actor;
 

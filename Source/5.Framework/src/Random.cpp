@@ -1,4 +1,4 @@
-#include "Random.hpp"
+#include "Core/Random.hpp"
 
 void Random::Init()
 {

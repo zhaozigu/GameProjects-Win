@@ -4,7 +4,7 @@
 #include "RendererSDL.hpp"
 #include "SpriteComponent.hpp"
 #include "BGSpriteComponent.hpp"
-#include "Actor.hpp"
+#include "Core/Actor.hpp"
 #include "Ship.hpp"
 
 #include <SDL.h>

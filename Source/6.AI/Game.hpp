@@ -2,7 +2,7 @@
 /// \brief Game class header file
 
 #pragma once
-#include "GameInterface.hpp"
+#include "Core/GameInterface.hpp"
 #include <vector>
 #include <string>
 #include <memory>

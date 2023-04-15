@@ -1,8 +1,8 @@
-#include "Actor.hpp"
+#include "Core/Actor.hpp"
 #include <algorithm>
 
-#include "Component.hpp"
-#include "GameInterface.hpp"
+#include "Core/Component.hpp"
+#include "Core/GameInterface.hpp"
 
 Actor::Actor()
     : mState(State::EActive), mPosition(Vector2::Zero), mScale(1.0f), mRotation(0.0f), mGame(nullptr)

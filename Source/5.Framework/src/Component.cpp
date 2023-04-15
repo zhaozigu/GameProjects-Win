@@ -1,5 +1,5 @@
-#include "Component.hpp"
-#include "Actor.hpp"
+#include "Core/Component.hpp"
+#include "Core/Actor.hpp"
 
 Component::Component(std::weak_ptr<Actor> owner, int updateOrder)
     : mOwner(owner), mUpdateOrder(updateOrder)

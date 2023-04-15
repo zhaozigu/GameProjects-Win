@@ -1,6 +1,6 @@
 #include "SpriteComponent.hpp"
-#include "GameInterface.hpp"
-#include "Actor.hpp"
+#include "Core/GameInterface.hpp"
+#include "Core/Actor.hpp"
 
 SpriteComponent::SpriteComponent(std::weak_ptr<Actor> owner, int drawOrder)
     : Component(owner), mTexture(nullptr), mDrawOrder(drawOrder)

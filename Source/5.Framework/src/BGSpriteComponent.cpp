@@ -1,5 +1,5 @@
 #include "BGSpriteComponent.hpp"
-#include "Actor.hpp"
+#include "Core/Actor.hpp"
 
 BGSpriteComponent::BGSpriteComponent(std::weak_ptr<Actor> owner, int drawOrder)
     : SpriteComponent(owner, drawOrder), mScrollSpeed(0.0f)
