@@ -6,6 +6,7 @@
 - GameObject: Hybrid component model
 - Sprites：2D sprite animation
 - Physics：Simple physical collisions
+- **Framework**: A hybrid component microframework using modern C++ features
 
 ## 🕹 Introduction
 

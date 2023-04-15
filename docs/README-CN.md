@@ -6,6 +6,7 @@
 - GameObject：混合式组件模型
 - Sprites：2D 精灵动画
 - Physics：简单的物理碰撞
+- **Framework**: 使用现代C++特性的混合组件微框架
 
 ## 🕹 简介
 
