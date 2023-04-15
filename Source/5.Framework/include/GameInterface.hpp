@@ -32,6 +32,10 @@ public:
 
     virtual void RemoveActor(SharedActor &&actor) = 0;
 
+    virtual	void AddSprite(std::shared_ptr<class SpriteComponent> &&sprite) = 0;
+
+	virtual void RemoveSprite(std::shared_ptr<class SpriteComponent> &&sprite) = 0;
+
 protected:
     /// \brief Process input
     /// This method should handle any input processing required by the game.

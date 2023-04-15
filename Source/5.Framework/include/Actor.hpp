@@ -60,10 +60,10 @@ public:
     virtual void RemoveComponent(SharedComp &&component);
 
     // 被 Game 调用的的 ProcessInput
-    virtual void ProcessInput(const uint8_t *keyState) = 0;
+    virtual void ProcessInput(const uint8_t *keyState);
 
     // 特定 Actor 输入
-    virtual void ActorInput(const uint8_t *keyState) = 0;
+    virtual void ActorInput(const uint8_t *keyState);
 
 protected:
     // Actor的状态

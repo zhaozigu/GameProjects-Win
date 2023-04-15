@@ -3,26 +3,27 @@
 #include <optional>
 #include "SDL.h"
 #include "Asset.hpp"
+#include "Game.hpp"
 
-class ATexture_SDL;
-
-template <>
-struct asset_traits<AssetType::Texture>
-{
-    using asset_type = SDL_Texture *;
-};
-
-class ATexture_SDL : public Asset<AssetType::Texture>
+class ATexture_SDL : public ITextureAsset
 {
 public:
-    ATexture_SDL(std::optional<SDL_Renderer *> &mRenderer);
+    ATexture_SDL(const char *filename, class RendererSDL *mRenderer);
 
     virtual ~ATexture_SDL();
 
     virtual bool Initialize() override;
 
-    virtual bool LoadTexture(const char *filename);
+    virtual SDL_Texture *GetTexture() { return texture_; };
 
 protected:
-    std::optional<SDL_Renderer *> renderer_;
+    class RendererSDL *renderer_;
+
+    SDL_Texture *texture_ = nullptr;
+    bool isInit_ = false;
 };
+
+inline std::shared_ptr<ITextureAsset> GetTextureAsset(Game* game, const std::string& filename)
+{
+    return std::dynamic_pointer_cast<ITextureAsset>(game->GetTexture(filename));
+}

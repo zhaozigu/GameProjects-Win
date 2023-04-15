@@ -8,18 +8,18 @@ AssetManager::~AssetManager()
 {
 }
 
-AssetType AssetManager::GetAssetType(const std::string &name)
+ResourceType AssetManager::GetAssetType(const std::string &name)
 {
     auto it = assets.find(name);
     if (it != assets.end())
     {
-        return it->second->GetAssetType();
+        return it->second->GetResourceType();
     }
 
-    return AssetType::Unknown;
+    return ResourceType::Unknown;
 }
 
-SharedResource AssetManager::GetResource(const std::string &name)
+SharedResource AssetManager::GetAsset(const std::string &name)
 {
     auto it = assets.find(name);
     if (it != assets.end())
@@ -29,7 +29,7 @@ SharedResource AssetManager::GetResource(const std::string &name)
     return std::make_shared<Resource>();
 }
 
-bool AssetManager::AddResource(const std::string &label, SharedResource &&resource)
+bool AssetManager::AddAsset(const std::string &label, SharedResource &&resource)
 {
     if (!IsAssetExist(label))
     {

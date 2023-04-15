@@ -10,11 +10,11 @@ public:
 
     virtual ~AssetManager();
 
-    virtual AssetType GetAssetType(const std::string &name);
+    virtual ResourceType GetAssetType(const std::string &name);
 
-    virtual SharedResource GetResource(const std::string &name);
+    virtual SharedResource GetAsset(const std::string &name);
 
-    virtual bool AddResource(const std::string &label, SharedResource &&resource);
+    virtual bool AddAsset(const std::string &label, SharedResource &&resource);
 
     virtual void DeleteResource(const std::string &name);
 

@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 
-enum class AssetType
+enum class ResourceType
 {
     Unknown = 0,
     Texture = 1,
@@ -11,58 +11,55 @@ enum class AssetType
     Font = 3,
 };
 
-template <AssetType AssetTypeID>
-struct asset_traits
+class Asset
 {
-    virtual ~asset_traits() {}
+public:
+    Asset() {}
+
+    virtual ~Asset() {}
+    virtual bool Initialize() = 0;
 };
 
 class Resource
 {
 public:
-    Resource(AssetType assetType = AssetType::Unknown) : type_(assetType){};
-    virtual ~Resource(){};
+    Resource(ResourceType assetType = ResourceType::Unknown) : type_(assetType) {}
 
-    virtual AssetType GetAssetType() { return type_; }
+    Resource(ResourceType assetType, std::shared_ptr<Asset> &&asset) : type_(assetType), resource_(asset) {}
 
-    virtual void SetAssetType(AssetType assetType) { type_ = assetType; }
+    virtual bool Initialize() { return false; }
+
+    virtual ~Resource() {}
+
+    virtual ResourceType GetResourceType() const { return type_; }
+
+    virtual void SetResourceType(ResourceType resourceType) { type_ = resourceType; }
+
+    virtual const std::shared_ptr<Asset> &GetResource() const { return resource_; }
+
+    virtual void SetResource(std::shared_ptr<Asset> &resource) { resource_ = resource; }
 
 protected:
-    AssetType type_;
+    ResourceType type_;
+    std::shared_ptr<Asset> resource_;
 };
 
-template <>
-struct asset_traits<AssetType::Unknown>
+class ITextureAsset : public Asset
 {
-    using asset_type = Resource;
-};
-
-template <AssetType AssetTypeID>
-class Asset : public Resource, asset_traits<AssetTypeID>
-{
-    using ResourceType = typename asset_traits<AssetTypeID>::asset_type;
-
 public:
-    Asset(AssetType assetType = AssetType::Unknown) : Resource(assetType), resource(nullptr){};
+    ITextureAsset() {}
 
-    virtual ~Asset(){};
+    virtual ~ITextureAsset() {}
 
-    virtual bool Initialize() = 0;
+    virtual int GetTexWidth() const { return texWidth_; }
 
-    virtual ResourceType GetAsset() const { return resource; }
+    virtual int GetTexHeight() const { return texHeight_; }
 
-    virtual void SetAsset(ResourceType &asset) { resource = asset; }
+    virtual void SetTexHeight(int height) { texHeight_ = height; };
+
+    virtual void SetTexWidth(int width) { texWidth_ = width; };
 
 protected:
-    ResourceType resource;
+    int texWidth_ = 0;
+    int texHeight_ = 0;
 };
-
-namespace AssetCast
-{
-    template<typename T>
-    inline T* Cast(Resource* res)
-    {
-        return dynamic_cast<T*>(res);
-    }
-}
-

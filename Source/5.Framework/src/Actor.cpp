@@ -7,7 +7,6 @@
 Actor::Actor()
     : mState(State::EActive), mPosition(Vector2::Zero), mScale(1.0f), mRotation(0.0f), mGame(nullptr)
 {
-
 }
 
 void Actor::BindGame(GamePtr game)
@@ -75,7 +74,7 @@ void Actor::RemoveComponent(std::shared_ptr<Component> &&component)
     }
 }
 
-void Actor::ProcessInput(const uint8_t* keyState)
+void Actor::ProcessInput(const uint8_t *keyState)
 {
     if (mState == State::EActive)
     {
@@ -84,11 +83,11 @@ void Actor::ProcessInput(const uint8_t* keyState)
         {
             comp->ProcessInput(keyState);
         }
-        
+
         ActorInput(keyState);
     }
 }
 
-void Actor::ActorInput(const uint8_t* keyState)
+void Actor::ActorInput(const uint8_t *keyState)
 {
 }

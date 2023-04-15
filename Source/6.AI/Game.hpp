@@ -3,7 +3,7 @@
 
 #pragma once
 #include "GameInterface.hpp"
-
+#include <vector>
 #include <string>
 #include <memory>
 
@@ -38,11 +38,22 @@ public:
 	/// \brief Shut down the game
 	void Shutdown() override;
 
-	void AddActor(SharedActor&& actor) override;
+	void AddActor(SharedActor &&actor) override;
 
-	void RemoveActor(SharedActor&& actor) override;
+	void RemoveActor(SharedActor &&actor) override;
+
+	void AddSprite(std::shared_ptr<class SpriteComponent> &&sprite) override;
+
+	void RemoveSprite(std::shared_ptr<class SpriteComponent> &&sprite) override;
+
+	std::shared_ptr<class ATexture_SDL> GetTexture(const std::string& fileName);
 
 private:
+
+	void LoadData();
+
+	void UnloadData();
+
 	/// \brief Process input
 	/// This method should handle any input processing required by the game.
 	void ProcessInput() override;
@@ -54,6 +65,8 @@ private:
 	/// \brief Generate output
 	/// This method should handle generating the output (e.g., rendering) for the game.
 	void GenerateOutput() override;
+
+	void RemoveDeadActors(std::vector<std::shared_ptr<Actor>> &actors);
 
 private:
 	class Impl;
