@@ -3,6 +3,7 @@
 
 #pragma once
 #include <memory>
+#include "SpriteComponent.hpp"
 
 using SharedActor = std::shared_ptr<class Actor>;
 
@@ -14,9 +15,9 @@ class GameInterface
 {
 public:
     /// \brief Constructor
-    GameInterface(){};
+    GameInterface() = default;
 
-    virtual ~GameInterface() {}
+    virtual ~GameInterface() = default;
 
     /// \brief Initialize the game
     /// \return Returns true if initialization is successful, false otherwise
@@ -32,9 +33,9 @@ public:
 
     virtual void RemoveActor(SharedActor &&actor) = 0;
 
-    virtual	void AddSprite(std::shared_ptr<class SpriteComponent> &&sprite) = 0;
+    virtual void AddSprite(std::shared_ptr<SpriteComponent> &&sprite) = 0;
 
-	virtual void RemoveSprite(std::shared_ptr<class SpriteComponent> &&sprite) = 0;
+    virtual void RemoveSprite(std::shared_ptr<SpriteComponent> &&sprite) = 0;
 
 protected:
     /// \brief Process input
