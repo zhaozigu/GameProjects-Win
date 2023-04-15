@@ -26,6 +26,8 @@ public:
 
     virtual void Clear();
 
+    virtual void RenderColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+
 protected:
     SDL_Window *window_ = nullptr;
     SDL_Renderer *renderer_ = nullptr;

@@ -5,61 +5,32 @@
 #include "AnimSpriteComponent.hpp"
 #include "Game.hpp"
 #include "TextureAsset.hpp"
+#include "Laser.hpp"
+#include "InputComponent.hpp"
 
 Ship::Ship()
-    : mRightSpeed(0.0f), mDownSpeed(0.0f)
+    : Actor()
+    , mLaserCooldown(0.0f)
 {
 }
 
 void Ship::UpdateActor(float deltaTime)
 {
-    Actor::UpdateActor(deltaTime);
-    // 基于速度和增量时间更新位置
-    Vector2 pos = GetPosition();
-    pos.x += mRightSpeed * deltaTime;
-    pos.y += mDownSpeed * deltaTime;
-
-    // 限制在屏幕左半部分
-    if (pos.x < 25.0f)
-    {
-        pos.x = 25.0f;
-    }
-    else if (pos.x > 500.0f)
-    {
-        pos.x = 500.0f;
-    }
-    if (pos.y < 25.0f)
-    {
-        pos.y = 25.0f;
-    }
-    else if (pos.y > 743.0f)
-    {
-        pos.y = 743.0f;
-    }
-    SetPosition(pos);
+    mLaserCooldown -= deltaTime;
 }
 
-void Ship::ProcessKeyboard(const uint8_t *state)
+void Ship::ActorInput(const uint8_t* keyState)
 {
-    mRightSpeed = 0.0f;
-    mDownSpeed = 0.0f;
-    // 右/左
-    if (state[SDL_SCANCODE_D] || state[SDL_SCANCODE_RIGHT])
+    if (keyState[SDL_SCANCODE_SPACE] && mLaserCooldown <= 0.0f)
     {
-        mRightSpeed += 250.0f;
-    }
-    if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_LEFT])
-    {
-        mRightSpeed -= 250.0f;
-    }
-    // 上/下
-    if (state[SDL_SCANCODE_S] || state[SDL_SCANCODE_DOWN])
-    {
-        mDownSpeed += 300.0f;
-    }
-    if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP])
-    {
-        mDownSpeed -= 300.0f;
+        // 创建激光
+        auto laser = std::make_shared<Laser>();
+        laser->Initialize(mGame);
+        laser->SetPosition(GetPosition());
+        laser->SetRotation(GetRotation());
+
+        // 设定冷却期
+        mLaserCooldown = 0.5f;
     }
 }
 
@@ -68,14 +39,17 @@ void Ship::Initialize(GamePtr game)
     Actor::Initialize(game);
 
     // 创建一个动画精灵组件
-    std::shared_ptr<AnimSpriteComponent> asc = std::make_shared<AnimSpriteComponent>(GetSelf());
-    Game* gamePtr = dynamic_cast<Game *>(GetGame());
-    std::vector<std::shared_ptr<ITextureAsset>> anims = {
-        GetTextureAsset(gamePtr->GetTexture("Assets/Ship01.png")),
-        GetTextureAsset(gamePtr->GetTexture("Assets/Ship02.png")),
-        GetTextureAsset(gamePtr->GetTexture("Assets/Ship03.png")),
-        GetTextureAsset(gamePtr->GetTexture("Assets/Ship04.png")),
-    };
-    asc->SetAnimTextures(anims);
+    std::shared_ptr<AnimSpriteComponent> asc = std::make_shared<AnimSpriteComponent>(GetSelf(), 150);
+    auto temp = GetTextureAsset(Game::CastPtr(game)->GetTexture("Assets/Ship.png"));
+    asc->SetTexture(temp);
     asc->AddComponent();
+
+    std::shared_ptr<InputComponent> ic = std::make_shared<InputComponent>(GetSelf());
+    ic->SetForwardKey(SDL_SCANCODE_W);
+    ic->SetBackKey(SDL_SCANCODE_S);
+    ic->SetClockwiseKey(SDL_SCANCODE_A);
+    ic->SetCounterClockwiseKey(SDL_SCANCODE_D);
+    ic->SetMaxForwardSpeed(300.0f);
+    ic->SetMaxAngularSpeed(Math::TwoPi);
+    ic->AddComponent();
 }

@@ -5,16 +5,12 @@
 class Ship : public Actor
 {
 public:
-  Ship();
-  void UpdateActor(float deltaTime) override;
+	Ship();
+	void UpdateActor(float deltaTime) override;
+	void ActorInput(const uint8_t *keyState) override;
 
-  void ProcessKeyboard(const uint8_t* state);
-  float GetRightSpeed() const { return mRightSpeed; }
-  float GetDownSpeed() const { return mDownSpeed; }
-
-  void Initialize(GamePtr game) override;
+	void Initialize(GamePtr game) override;
 
 private:
-  float mRightSpeed;
-  float mDownSpeed;
+	float mLaserCooldown;
 };

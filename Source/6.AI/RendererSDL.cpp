@@ -79,3 +79,8 @@ void RendererSDL::Clear()
 {
 	SDL_RenderClear(renderer_);
 }
+
+void RendererSDL::RenderColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+	SDL_SetRenderDrawColor(renderer_, r, g, b, a);
+}

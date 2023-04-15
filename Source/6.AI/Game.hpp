@@ -48,6 +48,17 @@ public:
 
 	std::shared_ptr<class ATexture_SDL> GetTexture(const std::string &fileName);
 
+	static inline Game *CastPtr(GameInterface *game)
+	{
+		return game ? dynamic_cast<Game *>(game) : nullptr;
+	}
+
+	void AddAsteroid(std::shared_ptr<class Asteroid> &&ast);
+
+	void RemoveAsteroid(std::shared_ptr<class Asteroid> &&ast);
+
+	std::vector<std::shared_ptr<Asteroid>> &GetAsteroids();
+
 private:
 	void LoadData();
 

@@ -6,6 +6,7 @@
 #include "BGSpriteComponent.hpp"
 #include "Core/Actor.hpp"
 #include "Ship.hpp"
+#include "Asteroid.hpp"
 
 #include <SDL.h>
 
@@ -23,6 +24,7 @@ public:
 	std::vector<std::shared_ptr<Actor>> mActors;
 	std::vector<std::shared_ptr<Actor>> mPendingActors;
 	std::vector<std::shared_ptr<SpriteComponent>> mSprites;
+	std::vector<std::shared_ptr<Asteroid>> mAsteroids;
 };
 
 Game::Game()
@@ -34,31 +36,16 @@ void Game::LoadData()
 {
 	impl->mShip = std::make_shared<Ship>();
 	impl->mShip->Initialize(this);
-	impl->mShip->SetPosition(Vector2(100.0f, 384.0f));
-	impl->mShip->SetScale(1.5f);
+	impl->mShip->SetPosition(Vector2(512.0f, 384.0f));
+	impl->mShip->SetRotation(Math::PiOver2);
 
-	std::shared_ptr<Actor> temp = std::make_shared<Actor>();
-	temp->Initialize(this);
-	temp->SetPosition(Vector2(512.0f, 384.0f));
-
-	 std::shared_ptr<class BGSpriteComponent> bg = std::make_shared<BGSpriteComponent>(temp);
-	 bg->SetScreenSize(Vector2(1024.0f, 768.0f));
-	 std::vector<std::shared_ptr<ITextureAsset>> bgtexs = {
-	 	GetTexture("Assets/Farback01.png"),
-	 	GetTexture("Assets/Farback02.png") };
-	 bg->SetBGTextures(bgtexs);
-	 bg->SetScrollSpeed(-100.0f);
-	 bg->AddComponent();
-
-	 // 创建一个更近的背景
-	 bg = std::make_shared<BGSpriteComponent>(temp, 50);
-	 bg->SetScreenSize(Vector2(1024.0f, 768.0f));
-	 bgtexs = {
-	 	GetTexture("Assets/Stars.png"),
-	 	GetTexture("Assets/Stars.png") };
-	 bg->SetBGTextures(bgtexs);
-	 bg->SetScrollSpeed(-200.0f);
-	 bg->AddComponent();
+	// 创建行星
+	constexpr int kNumAsteroids = 20;
+	for (int i = 0; i < kNumAsteroids; i++)
+	{
+		auto t = std::make_shared<Asteroid>();
+		t->Initialize(this);
+	}
 }
 
 Game::~Game() {}
@@ -121,8 +108,7 @@ void Game::Shutdown()
 	SDL_Quit();
 }
 
-
-void Game::AddActor(std::shared_ptr<Actor>&& actor)
+void Game::AddActor(std::shared_ptr<Actor> &&actor)
 {
 	// 如果正在更新actor，就添加到待处理列表里
 	if (impl->mUpdatingActors)
@@ -135,7 +121,7 @@ void Game::AddActor(std::shared_ptr<Actor>&& actor)
 	}
 }
 
-void Game::RemoveActor(std::shared_ptr<Actor>&& actor)
+void Game::RemoveActor(std::shared_ptr<Actor> &&actor)
 {
 	// 是否在待定actor中
 	auto iter = std::find(impl->mPendingActors.begin(), impl->mPendingActors.end(), actor);
@@ -156,15 +142,15 @@ void Game::RemoveActor(std::shared_ptr<Actor>&& actor)
 	}
 }
 
-void Game::AddSprite(std::shared_ptr<SpriteComponent>&& sprite)
+void Game::AddSprite(std::shared_ptr<SpriteComponent> &&sprite)
 {
 	// 在有序向量中找到插入点
 	// (第一个比传入的sprite的order顺序大的元素)
 	int myDrawOrder = sprite->GetDrawOrder();
 	auto iter = impl->mSprites.begin();
 	for (;
-		iter != impl->mSprites.end();
-		++iter)
+		 iter != impl->mSprites.end();
+		 ++iter)
 	{
 		if (myDrawOrder < (*iter)->GetDrawOrder())
 		{
@@ -176,7 +162,7 @@ void Game::AddSprite(std::shared_ptr<SpriteComponent>&& sprite)
 	impl->mSprites.insert(iter, sprite);
 }
 
-void Game::RemoveSprite(std::shared_ptr<SpriteComponent>&& sprite)
+void Game::RemoveSprite(std::shared_ptr<SpriteComponent> &&sprite)
 {
 	// (不能交换，不然顺序就没了)
 	auto iter = std::find(impl->mSprites.begin(), impl->mSprites.end(), sprite);
@@ -208,7 +194,12 @@ void Game::ProcessInput()
 		impl->mIsRunning = false;
 	}
 
-	impl->mShip->ProcessKeyboard(state);
+	impl->mUpdatingActors = true;
+	for (auto actor : impl->mActors)
+	{
+		actor->ProcessInput(state);
+	}
+	impl->mUpdatingActors = false;
 }
 
 void Game::UpdateGame()
@@ -251,10 +242,11 @@ void Game::UpdateGame()
 
 void Game::GenerateOutput()
 {
+	impl->renderer->RenderColor(220, 220, 220, 255);
 	impl->renderer->Clear();
 
 	// 绘制所有精灵组件
-	for (auto& sprite : impl->mSprites)
+	for (auto &sprite : impl->mSprites)
 	{
 		sprite->Draw(std::dynamic_pointer_cast<RendererInterface>(impl->renderer));
 	}
@@ -274,7 +266,7 @@ void Game::RemoveDeadActors(std::vector<std::shared_ptr<Actor>> &actors)
 	}
 }
 
-std::shared_ptr<ATexture_SDL> Game::GetTexture(const std::string& filename)
+std::shared_ptr<ATexture_SDL> Game::GetTexture(const std::string &filename)
 {
 	auto iter = impl->manager.GetAsset(filename);
 	if (iter->GetResourceType() == ResourceType::Texture)
@@ -287,4 +279,24 @@ std::shared_ptr<ATexture_SDL> Game::GetTexture(const std::string& filename)
 		impl->manager.AddAsset(filename, std::make_shared<Resource>(ResourceType::Texture, std::move(std::dynamic_pointer_cast<Asset>(tex))));
 		return tex;
 	}
+}
+
+void Game::AddAsteroid(std::shared_ptr<Asteroid> &&ast)
+{
+	impl->mAsteroids.emplace_back(ast);
+}
+
+void Game::RemoveAsteroid(std::shared_ptr<Asteroid> &&ast)
+{
+	auto iter = std::find(impl->mAsteroids.begin(),
+						  impl->mAsteroids.end(), ast);
+	if (iter != impl->mAsteroids.end())
+	{
+		impl->mAsteroids.erase(iter);
+	}
+}
+
+std::vector<std::shared_ptr<Asteroid>> &Game::GetAsteroids()
+{
+	return impl->mAsteroids;
 }
