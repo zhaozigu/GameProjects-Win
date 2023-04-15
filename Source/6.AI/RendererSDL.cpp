@@ -41,14 +41,9 @@ void RendererSDL::DestoryRenderer()
 	}
 }
 
-static SDL_Rect&& CreateRect(const RendererRect &r)
+static SDL_Rect CreateRect(const RendererRect &r)
 {
-	SDL_Rect rect;
-	rect.h = r.h;
-	rect.w = r.w;
-	rect.x = r.x;
-	rect.y = r.y;
-	return std::move(rect);
+	return { .x = r.x, .y = r.y, .w = r.w, .h = r.h };
 }
 
 int RendererSDL::DrawTexture(ITextureAsset &tex, const RendererRect &rect, double angle)

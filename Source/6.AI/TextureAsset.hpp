@@ -23,7 +23,7 @@ protected:
     bool isInit_ = false;
 };
 
-inline std::shared_ptr<ITextureAsset> GetTextureAsset(Game* game, const std::string& filename)
+inline std::shared_ptr<ITextureAsset> GetTextureAsset(std::shared_ptr<ATexture_SDL> texture)
 {
-    return std::dynamic_pointer_cast<ITextureAsset>(game->GetTexture(filename));
+    return std::dynamic_pointer_cast<ITextureAsset>(texture);
 }

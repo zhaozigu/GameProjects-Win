@@ -46,10 +46,9 @@ public:
 
 	void RemoveSprite(std::shared_ptr<class SpriteComponent> &&sprite) override;
 
-	std::shared_ptr<class ATexture_SDL> GetTexture(const std::string& fileName);
+	std::shared_ptr<class ATexture_SDL> GetTexture(const std::string &fileName);
 
 private:
-
 	void LoadData();
 
 	void UnloadData();

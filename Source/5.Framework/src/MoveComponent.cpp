@@ -1,20 +1,13 @@
-#include "MoveComponent.h"
-#include "Actor.h"
-#include <SDL_log.h>
+#include "MoveComponent.hpp"
+#include "Core/Actor.hpp"
 
 MoveComponent::MoveComponent(std::weak_ptr<class Actor> owner, int updateOrder)
     : Component(owner, updateOrder), mAngularSpeed(0.0f), mForwardSpeed(0.0f)
 {
-#ifdef _DEBUG
-    SDL_Log("MoveComponent()");
-#endif _DEBUG
 }
 
 MoveComponent::~MoveComponent()
 {
-#ifdef _DEBUG
-    SDL_Log("~MoveComponent()");
-#endif _DEBUG
 }
 
 void MoveComponent::Update(float deltaTime)

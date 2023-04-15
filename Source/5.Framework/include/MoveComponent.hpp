@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "Core/Component.hpp"
 
 class MoveComponent : public Component
 {

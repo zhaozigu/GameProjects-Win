@@ -71,10 +71,10 @@ void Ship::Initialize(GamePtr game)
     std::shared_ptr<AnimSpriteComponent> asc = std::make_shared<AnimSpriteComponent>(GetSelf());
     Game* gamePtr = dynamic_cast<Game *>(GetGame());
     std::vector<std::shared_ptr<ITextureAsset>> anims = {
-        GetTextureAsset(gamePtr, "Assets/Ship01.png"),
-        GetTextureAsset(gamePtr, "Assets/Ship02.png"),
-        GetTextureAsset(gamePtr, "Assets/Ship03.png"),
-        GetTextureAsset(gamePtr, "Assets/Ship04.png"),
+        GetTextureAsset(gamePtr->GetTexture("Assets/Ship01.png")),
+        GetTextureAsset(gamePtr->GetTexture("Assets/Ship02.png")),
+        GetTextureAsset(gamePtr->GetTexture("Assets/Ship03.png")),
+        GetTextureAsset(gamePtr->GetTexture("Assets/Ship04.png")),
     };
     asc->SetAnimTextures(anims);
     asc->AddComponent();
