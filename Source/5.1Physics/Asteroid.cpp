@@ -6,6 +6,7 @@
 #include "Game.hpp"
 #include "TextureAsset.hpp"
 
+
 Asteroid::Asteroid()
 {
 }

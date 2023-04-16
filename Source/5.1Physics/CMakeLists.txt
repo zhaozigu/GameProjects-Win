@@ -1,4 +1,4 @@
-project(AI VERSION 0.5)
+project(Physics2 VERSION 0.5)
 
 set(SDL2_DIR ../../ThirdParty/SDL2-2.26.5/cmake)
 find_package(SDL2 REQUIRED)
