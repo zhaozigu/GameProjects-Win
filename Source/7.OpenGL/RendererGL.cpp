@@ -48,6 +48,7 @@ RendererGL::~RendererGL()
 
 void RendererGL::DestoryRenderer()
 {
+    mSpriteShader.Unload();
     if (context_)
     {
         SDL_GL_DeleteContext(context_);
@@ -83,4 +84,25 @@ void RendererGL::RenderColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 void RendererGL::RenderColorFloat(float r, float g, float b, float a)
 {
     glClearColor(r, g, b, a);
+}
+
+bool RendererGL::LoadShaders(const std::string& vertName, const std::string& fragName)
+{
+    if (!mSpriteShader.Load(vertName, fragName))
+    {
+        return false;
+    }
+
+    mSpriteShader.SetActive();
+    return true;
+}
+
+void RendererGL::DrawElements(size_t count)
+{
+    glDrawElements(
+        GL_TRIANGLES, // 图元
+        count, // 索引数量
+        GL_UNSIGNED_INT, // 索引类型
+        nullptr // 经常是 nullptr
+    );
 }

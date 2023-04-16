@@ -4,7 +4,9 @@
 #include "BGSpriteComponent.hpp"
 #include "Core/Actor.hpp"
 #include "RendererGL.hpp"
+#include "VertexArray.hpp"
 
+#include <vector>
 #include <SDL.h>
 
 class Game::Impl
@@ -15,7 +17,7 @@ public:
 	AssetManager manager;
 	Uint32 mTicksCount;
 	bool mUpdatingActors = false;
-
+	std::unique_ptr<VertexArray> mSpriteVerts;
 	std::shared_ptr<RendererGL> renderer;
 
 	std::vector<std::shared_ptr<Actor>> mActors;
@@ -30,6 +32,22 @@ Game::Game()
 
 void Game::LoadData()
 {
+}
+
+void Game::CreateSpriteVerts()
+{
+	std::vector<float> vertexBuffer = {
+		-0.5f, 0.5f, 0.0f, // 0
+		0.5f, 0.5f, 0.0f,  // 1
+		0.5f, -0.5f, 0.0f, // 2
+		-0.5f, -0.5f, 0.0f // 3
+	};
+
+	std::vector<unsigned int> indexBuffer = {
+		0, 1, 2,
+		2, 3, 0};
+
+	impl->mSpriteVerts = std::make_unique<VertexArray>(vertexBuffer, indexBuffer);
 }
 
 Game::~Game() {}
@@ -63,8 +81,15 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 		return false;
 	}
 
-
 	LoadData();
+	CreateSpriteVerts();
+
+	if (!impl->renderer->LoadShaders("Shaders/Basic.vert", "Shaders/Basic.frag"))
+	{
+		SDL_Log("failed to load shaders");
+		return false;
+	}
+
 	impl->mTicksCount = SDL_GetTicks();
 	return true;
 }
@@ -226,6 +251,10 @@ void Game::GenerateOutput()
 {
 	impl->renderer->RenderColorFloat(0.86f, 0.86f, 0.86f, 1.0f);
 	impl->renderer->Clear();
+	impl->mSpriteVerts->SetActive();
+
+	impl->renderer->DrawElements(impl->mSpriteVerts->GetNumIndices());
+
 	impl->renderer->Present();
 }
 

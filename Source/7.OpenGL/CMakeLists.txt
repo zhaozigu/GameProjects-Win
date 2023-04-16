@@ -32,6 +32,13 @@ if(SDL2_FOUND AND SDL2_image_FOUND)
       )
   endif()
 
+  if (EXISTS ${PROJECT_SOURCE_DIR}/Shaders)
+    add_custom_command (TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+      ${PROJECT_SOURCE_DIR}/Shaders  $<TARGET_FILE_DIR:${PROJECT_NAME}>/Shaders
+    )
+  endif()
+
   set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY $<TARGET_FILE_DIR:${PROJECT_NAME}>
   )

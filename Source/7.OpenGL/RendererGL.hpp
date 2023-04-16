@@ -2,6 +2,7 @@
 
 #include "RendererInterface.hpp"
 #include "SDL.h"
+#include "GLShader.hpp"
 
 class RendererGL : public RendererInterface
 {
@@ -26,7 +27,13 @@ public:
 
     virtual void RenderColorFloat(float r, float g, float b, float a);
 
+    virtual bool LoadShaders(const std::string &vertName, const std::string &fragName);
+
+    virtual void DrawElements(size_t count);
+
 protected:
     SDL_Window *window_ = nullptr;
     SDL_GLContext context_ = nullptr;
+
+    GLShader mSpriteShader;
 };

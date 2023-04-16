@@ -51,11 +51,12 @@ public:
 		return game ? dynamic_cast<Game *>(game) : nullptr;
 	}
 
-
 private:
 	void LoadData();
 
 	void UnloadData();
+
+	void CreateSpriteVerts();
 
 	/// \brief Process input
 	/// This method should handle any input processing required by the game.
