@@ -1,30 +1,26 @@
 #include "Game.hpp"
-#include "TextureAsset.hpp"
 #include "AssetManager.hpp"
-#include "RendererSDL.hpp"
 #include "SpriteComponent.hpp"
 #include "BGSpriteComponent.hpp"
 #include "Core/Actor.hpp"
-#include "Ship.hpp"
-#include "Asteroid.hpp"
+#include "RendererGL.hpp"
 
 #include <SDL.h>
 
 class Game::Impl
 {
 public:
-	SDL_Window *optWindow;
-	std::shared_ptr<RendererSDL> renderer;
+	SDL_Window *window;
 	bool mIsRunning = true;
 	AssetManager manager;
-	std::shared_ptr<Ship> mShip;
 	Uint32 mTicksCount;
 	bool mUpdatingActors = false;
+
+	std::shared_ptr<RendererGL> renderer;
 
 	std::vector<std::shared_ptr<Actor>> mActors;
 	std::vector<std::shared_ptr<Actor>> mPendingActors;
 	std::vector<std::shared_ptr<SpriteComponent>> mSprites;
-	std::vector<std::shared_ptr<Asteroid>> mAsteroids;
 };
 
 Game::Game()
@@ -34,18 +30,6 @@ Game::Game()
 
 void Game::LoadData()
 {
-	impl->mShip = std::make_shared<Ship>();
-	impl->mShip->Initialize(this);
-	impl->mShip->SetPosition(Vector2(512.0f, 384.0f));
-	impl->mShip->SetRotation(Math::PiOver2);
-
-	// 创建行星
-	constexpr int kNumAsteroids = 20;
-	for (int i = 0; i < kNumAsteroids; i++)
-	{
-		auto t = std::make_shared<Asteroid>();
-		t->Initialize(this);
-	}
 }
 
 Game::~Game() {}
@@ -59,27 +43,26 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 		return false;
 	}
 
-	impl->optWindow = SDL_CreateWindow(
+	impl->window = SDL_CreateWindow(
 		windowsName.c_str(),
 		x,
 		y,
 		w,
 		h,
-		0);
+		SDL_WINDOW_OPENGL);
 
-	if (!impl->optWindow)
+	if (!impl->window)
 	{
 		SDL_Log("Failed to create window: %s", SDL_GetError());
 		return false;
 	}
-
-	impl->renderer = std::make_shared<RendererSDL>(impl->optWindow);
-
+	impl->renderer = std::make_shared<RendererGL>(impl->window);
 	if (!impl->renderer->Initialize())
 	{
-		SDL_Log("failed to create renderer: %s", SDL_GetError());
+		SDL_Log("Failed to create gl renderer");
 		return false;
 	}
+
 
 	LoadData();
 	impl->mTicksCount = SDL_GetTicks();
@@ -88,7 +71,7 @@ bool Game::Initialize(const std::string &windowsName, int x, int y, int w, int h
 
 bool Game::Initialize()
 {
-	return Initialize("Physics by framework", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768);
+	return Initialize("OpenGL Environment", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768);
 }
 
 void Game::RunLoop()
@@ -103,8 +86,7 @@ void Game::RunLoop()
 
 void Game::Shutdown()
 {
-	impl->renderer->DestoryRenderer();
-	SDL_DestroyWindow(impl->optWindow);
+	SDL_DestroyWindow(impl->window);
 	SDL_Quit();
 }
 
@@ -242,15 +224,8 @@ void Game::UpdateGame()
 
 void Game::GenerateOutput()
 {
-	impl->renderer->RenderColor(220, 220, 220, 255);
+	impl->renderer->RenderColorFloat(0.86f, 0.86f, 0.86f, 1.0f);
 	impl->renderer->Clear();
-
-	// 绘制所有精灵组件
-	for (auto &sprite : impl->mSprites)
-	{
-		sprite->Draw(std::dynamic_pointer_cast<RendererInterface>(impl->renderer));
-	}
-
 	impl->renderer->Present();
 }
 
@@ -264,39 +239,4 @@ void Game::RemoveDeadActors(std::vector<std::shared_ptr<Actor>> &actors)
 		// 使用 erase 一次性删除所有符合条件的元素
 		impl->mActors.erase(new_end, impl->mActors.end());
 	}
-}
-
-std::shared_ptr<ATexture_SDL> Game::GetTexture(const std::string &filename)
-{
-	auto iter = impl->manager.GetAsset(filename);
-	if (iter->GetResourceType() == ResourceType::Texture)
-	{
-		return std::dynamic_pointer_cast<ATexture_SDL>(iter->GetResource());
-	}
-	else
-	{
-		auto tex = std::make_shared<ATexture_SDL>(filename.c_str(), impl->renderer.get());
-		impl->manager.AddAsset(filename, std::make_shared<Resource>(ResourceType::Texture, std::move(std::dynamic_pointer_cast<Asset>(tex))));
-		return tex;
-	}
-}
-
-void Game::AddAsteroid(std::shared_ptr<Asteroid> &&ast)
-{
-	impl->mAsteroids.emplace_back(ast);
-}
-
-void Game::RemoveAsteroid(std::shared_ptr<Asteroid> &&ast)
-{
-	auto iter = std::find(impl->mAsteroids.begin(),
-						  impl->mAsteroids.end(), ast);
-	if (iter != impl->mAsteroids.end())
-	{
-		impl->mAsteroids.erase(iter);
-	}
-}
-
-std::vector<std::shared_ptr<Asteroid>> &Game::GetAsteroids()
-{
-	return impl->mAsteroids;
 }
